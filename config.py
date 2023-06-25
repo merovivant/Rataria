@@ -1,3 +1,8 @@
+import pygame
+import leitor
+from leitor import Leitor
+from button import Button
+
 class Config:
     """
     Classe que armazena configurações e constantes relacionadas ao jogo.
@@ -18,13 +23,10 @@ class Config:
 
     # Configuração do rato
     RAT_COLOR = "blue"
-    RAT_LEFT = lambda color: pygame.transform.scale(pygame.image.load(f'imgs/ratos/{color}/ratin_left.png'), (Config.BLOCK_SIZE,Config.BLOCK_SIZE))
-    RAT_RIGHT = lambda color: pygame.transform.scale(pygame.image.load(f'imgs/ratos/{color}/ratin_right.png'), (Config.BLOCK_SIZE,Config.BLOCK_SIZE))
-
-    # Configuração do contador de vida
-    LIFE_WIDTH = 0.5*BLOCK_SIZE*(199/57)
-    LIFE_HEIGTH = 0.5*BLOCK_SIZE
-    LIFE = lambda x: pygame.transform.scale(pygame.image.load(f'imgs/lives/{x}.png'), (Config.LIFE_WIDTH, Config.LIFE_HEIGTH))
+    rato_direita = lambda color: pygame.image.load(f'imgs/ratos/{color}/ratin_right.png')
+    rato_esquerda = lambda color: pygame.image.load(f'imgs/ratos/{color}/ratin_left.png')
+    RAT_LEFT = lambda color, indice=0: pygame.transform.scale(Leitor.get_image_by_gid(Config.rato_esquerda(color), indice, 2, 65, 72) , (Config.BLOCK_SIZE,Config.BLOCK_SIZE))
+    RAT_RIGHT = lambda color, indice=0: pygame.transform.scale(Leitor.get_image_by_gid(Config.rato_direita(color), indice, 2, 65, 72) , (Config.BLOCK_SIZE,Config.BLOCK_SIZE))
 
     # Configuração da fonte
     font = pygame.font.SysFont("arialblacomicck", 40)
