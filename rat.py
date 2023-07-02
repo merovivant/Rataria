@@ -25,8 +25,6 @@ class Rat(Body):
         # Espaço para uma eventual animação de morte do rato
         if dead:
             Config.pontosJogador += 1
-            
-
 
     def __contains__(self, hitbox): #Sobscreve o operador in para verificar se um ponto está dentro da hitbox do rato
         sup_esq = hitbox[0].x >= self.pos.x and hitbox[0].x <= self.pos.x + Config.RAT_SIZE and hitbox[0].y >= self.pos.y and hitbox[0].y <= self.pos.y + Config.RAT_SIZE

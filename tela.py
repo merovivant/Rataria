@@ -2,9 +2,6 @@
 import pygame
 from config import Config
 from level import Level
-from leaderboard import Leaderboard
-from random import random
-from rat import Rat
 
 # Enum usado para diferenciar em qual modo o jogo está
 class Tela():    
@@ -12,10 +9,8 @@ class Tela():
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
-        self.clock = pygame.time.Clock()
         self.level = ''
         self.keys = None
-        self.leaderboard = Leaderboard("data/leaderboardPlacar.txt")
     
     @property # Getter para as teclas pressionadas
     def keys(self):
@@ -72,52 +67,7 @@ class Tela():
 
     def arcade(self,**kwargs):
         level = Level('data/levels/ARCADE.txt')
-        while not level.player.dead:
-            cooldownLeft = 0
-            cooldownRight = 0
-            self.screen.fill(Config.SCREEN_COLOR) # Preenchimento da tela com uma cor de fundo    
-
-            # Gera os inimigos na esquerda e na direta em tempo aleatorio respeitando o cooldown
-            
-            if random() < ((1.0/60.0)*0.6) and cooldownLeft >= 0:
-                level.bodies.insert(0,Rat(Config.RAT_COLOR, pygame.Vector2(0, 480), True))   
-            if random() < ((1.0/60.0)*0.6)and cooldownRight >= 0:
-                cooldownRight = 240
-                level.bodies.insert(0,Rat(Config.RAT_COLOR, pygame.Vector2(5040, 480), False))
-            # Diminuiu em um frame o tempo de cooldown
-            cooldownLeft -= 1
-            cooldownRight -= 1
-
-            if self.keys[pygame.K_ESCAPE]:
-                return self.menu_principal()
-            # Captura do input do jogador
-            if self.keys[pygame.K_w]:
-                level.player.jump()
-            if self.keys[pygame.K_a] and not self.keys[pygame.K_d]:
-                level.player.move_left()
-            elif self.keys[pygame.K_d] and not self.keys[pygame.K_a]:
-                level.player.move_right()
-            level.tilemap.draw(self.screen, level.camera) # Desenho do tilemap na tela, levando em consideração a câmera
-            
-            # Atualização e desenho de todos os corpos presentes no jogo
-            for body in level.bodies:
-                body.update(level.dt, level.bodies)
-                body.draw(self.screen, level.camera)
-            
-            # Atualização da posição da câmera para seguir o jogador
-            level.camera.pos.x = min(max(0, level.player.pos.x - Config.SCREEN_WIDTH / 2), level.tilemap.m * Config.BLOCK_SIZE - Config.SCREEN_WIDTH)
-            # Desenha o contador de vidas
-            self.screen.blit(Config.LIFE(level.player.lives), (15,10))
-            
-            # Desenha os pontos do jogador 
-            Config.draw_text(self.screen, Leaderboard.alinhado(Config.pontosJogador), Config.font2, Config.AMARELO, 1000, 40)
-
-            self.screen_update()
-            level.dt = self.clock.tick(60)
-        
-
-        self.leaderboard.adicionarJogador(Config.nomeJogador, Config.pontosJogador)
-        self.leaderboard.gravar("data/leaderboardPlacar.txt")
+        level.run_arcade(self)
         return self.menu_principal()
 
     '''
@@ -134,44 +84,8 @@ class Tela():
 
     def campanha(self, **kwargs):
         level = Level('data/levels/1.txt')
-
-        while not level.player.dead:
-            self.screen.fill(Config.SCREEN_COLOR) # Preenchimento da tela com uma cor de fundo 
-
-            if self.keys[pygame.K_ESCAPE]:  # Caso seja pressionado a telca ESC, a tela volta ao menu
-                return self.menu_principal()
-
-            # Captura do input do jogador
-            if self.keys[pygame.K_w]:
-                level.player.jump()
-            if self.keys[pygame.K_a] and not self.keys[pygame.K_d]:
-                level.player.move_left()
-            elif self.keys[pygame.K_d] and not self.keys[pygame.K_a]:
-                level.player.move_right()
-
-            level.tilemap.draw(self.screen, level.camera) # Desenho do tilemap na tela, levando em consideração a câmera
-            
-            # Atualização e desenho de todos os corpos presentes no jogo
-            for body in level.bodies:
-                body.update(level.dt,level.bodies)
-                body.draw(self.screen, level.camera)
-            
-            # Atualização da posição da câmera para seguir o jogador
-            level.camera.pos.x = min(max(0, level.player.pos.x - Config.SCREEN_WIDTH / 2), level.tilemap.m * Config.BLOCK_SIZE - Config.SCREEN_WIDTH)
-
-            # Desenha o contador de vidas
-            self.screen.blit(Config.LIFE(level.player.lives), (15,10))
-
-            #Desenha o contador de queijos
-            from cheese import Cheese
-            self.screen.blit(Config.CHEESE_COUNTER, (15, 20+Config.LIFE_HEIGTH))
-            Config.draw_text(self.screen, f"{Cheese.many_collected}", Config.font, Config.BRANCO, 15+0.7*Config.CHEESE_WIDTH+10, 20+Config.LIFE_HEIGTH)
-
-            self.screen_update()
-            level.dt = self.clock.tick(60)
+        level.run_campanha(self)
         return self.morte()
-
-    
     
     def leaderboardTela(self,**kwargs):
         while not self.keys[pygame.K_ESCAPE]:
