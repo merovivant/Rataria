@@ -48,8 +48,6 @@ class Tile(Body):
         return 0
     
     def rebound(self, body, direction): 
-        if direction == Collision.SIDE:
-            return 1
         return 0
 
     def collide(self, *args):

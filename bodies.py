@@ -17,12 +17,6 @@ class Bodies(list):
             try: assert not body.hitbox in b.hitbox # Verifica se a hitbox do corpo está dentro de outro corpo   
             except Collision as collision:
                 collision.bodies = (body, b)
-                if collision.direction == Collision.SIDE:
-                    print(f"Colisão lateral entre {type(body).__name__} e {type(b).__name__}")
-                elif collision.direction == Collision.TOP:
-                    print(f"Colisão superior entre {type(body).__name__} e {type(b).__name__}")
-                elif collision.direction == Collision.BELLOW:
-                    print(f"Colisão inferior entre {type(body).__name__} e {type(b).__name__}")
                 return True
             except AssertionError:
                 print("Erro no tratamento de colisão!")
