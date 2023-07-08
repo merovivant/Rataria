@@ -17,7 +17,6 @@ class Rat(Body):
         self.color = color
         self.indice = 0
         self.last_direction = 'right'
-        # self.ground = Config.SCREEN_HEIGHT - Config.BLOCK_SIZE
 
     @property
     def image(self):
@@ -63,16 +62,6 @@ class Rat(Body):
             self.velocity.x = max(self.velocity.x - 0.1, 0) 
         elif self.velocity.x < 0:
             self.velocity.x = min(self.velocity.x + 0.1, 0)
-        if self.falling: # Verifica se o rato está caindo
-            self.velocity.y += 0.1 # Aumenta a velocidade vertical para simular a aceleração da gravidade
-        # Verifica se o rato atingiu ou ultrapassou o chão
-        # if self.pos.y >= self.ground:
-        #     # Define que o rato não está mais caindo e zera a velocidade vertical
-        #     self.falling = False
-        #     self.velocity.y = 0
-        # else:
-        #     # Caso contrário, o rato está no ar e ainda está caindo
-        #     self.falling = True
 
     def draw(self, screen, camera):
         pos_x = self.pos.x - camera.pos.x #Calcula a posição inicial
@@ -80,9 +69,6 @@ class Rat(Body):
         
         pos = Vector(pos_x, self.pos.y)
         screen.blit(self.image, (pos.x, pos.y))
-
-        from pygame.draw import rect
-        rect(screen, (255,0,0), (self.hitbox.SE.x, self.hitbox.SE.y, self.width, self.height), 1)
 
     def move_left(self): # Move o rato para a esquerda com base na sua velocidade atual.
         self.last_direction = 'left'
@@ -101,6 +87,7 @@ class Rat(Body):
     def jump(self): # Faz o rato pular se não estiver caindo.
         if not self.falling:
             self.velocity.y += -1.5
+            self.falling = True
 
     def damage(self, body, direction): # Retorna o dano causado ao corpo passado como parâmetro em caso de colisão.
         if direction == Collision.TOP and isinstance(body, Rat):
@@ -127,14 +114,21 @@ class Rat(Body):
         Atualiza o estado do objeto Rat com base no tempo decorrido desde a última atualização.
         Args: dt (float): Tempo decorrido desde a última atualização em segundos.
         """
-        # print(type(self).__name__, self.pos)
         if self.kill: return
+        if self.falling: # Verifica se o rato está caindo   
+            self.velocity.y += 0.1 # Aumenta a velocidade vertical para simular a aceleração da gravidade
         x = self.pos.x + self.velocity.x * dt
         y = min(Config.SCREEN_HEIGHT - Config.BLOCK_SIZE, self.pos.y + self.velocity.y * dt)
         self.hitbox = Hitbox(Vector(x, y), self.width, self.height)
         if not self in bodies: #Verifica se há colisão com algum corpo
             self.pos = Vector(x, y)
-            #print(f"Nova: {self.pos}")
-        # else:
-            #print(f"Impedida: {x, y}")
+        else:
+            if self.falling:
+                self.hitbox = Hitbox(Vector(self.pos.x, y), self.width, self.height)
+                if not self in bodies:
+                    self.pos = Vector(self.pos.x, y)
+
+        self.hitbox = Hitbox(self.pos, self.width, self.height)
+        bodies.verify_bellow(self) # Verifica se há colisão com algum corpo abaixo do rato
+
         

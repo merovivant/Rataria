@@ -23,6 +23,7 @@ class Collision(Exception):
         y = self._receiver.hitbox.SD.y - self._producer.hitbox.SD.y
         y /= abs(self._receiver.hitbox.SD.y - self._producer.hitbox.SD.y) if y!=0 else 1
         rebound *= Vector(x, y)
+        rebound = rebound if rebound != (0,0) else Vector(1, 1)
         self._receiver.collide(damage, rebound)
         direction = self.direction if self.direction == Collision.SIDE else -1*self.direction
         damage = self._receiver.damage(self._producer, direction)
@@ -32,4 +33,5 @@ class Collision(Exception):
         y = self._producer.hitbox.SD.y - self._receiver.hitbox.SD.y
         y /= abs(self._producer.hitbox.SD.y - self._receiver.hitbox.SD.y) if y!=0 else 1
         rebound *= Vector(x, y)
+        rebound = rebound if rebound != (0,0) else Vector(1, 1)
         self._producer.collide(damage, rebound)

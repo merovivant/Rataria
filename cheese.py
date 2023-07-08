@@ -19,9 +19,6 @@ class Cheese(Body):
         pos = pygame.Vector2(pos_x, self.pos.y)
         screen.blit(self.image, (pos.x, pos.y))
 
-        from pygame.draw import rect
-        rect(screen, (255,0,0), (self.hitbox.SE.x, self.hitbox.SE.y, self.width, self.height), 1)
-
     def damage(self, body, *args):
         if isinstance(body, Player):
             body.cheese += 1

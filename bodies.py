@@ -20,26 +20,26 @@ class Bodies(list):
                 return True
             except AssertionError:
                 print("Erro no tratamento de colisão!")
-                return True
-        
-        hitbox_bellow = Hitbox(body.hitbox.SE, body.width, 81)
+                return True        
+        return False
+    
+    def verify_bellow(self, body: Body): # Verifica se a posição abaixo do corpo está dentro de outro corpo
+        hitbox_bellow = Hitbox(body.hitbox.SE, body.width, body.height+1)
         for b in self:
             if b == body or b.kill: continue
             try: assert not hitbox_bellow in b.hitbox # Verifica se a posição abaixo do corpo está dentro de outro corpo
             except Collision as collision:
                 body.falling = False
+                body.velocity.y = 0
                 if isinstance(body, Player) and isinstance(b, Rat):
                     collision.bodies = (body, b)
-                return False
-            except AssertionError:
-                print("Erro no tratamento de colisão!")
+                return
         body.falling = True
-        return False
     
     def update(self, dt): # Atualiza todos os corpos da lista
         for body in self:
             body.update(dt, self)
-
+            
     def draw(self, screen, camera):
         for body in self:
             if body.kill: continue

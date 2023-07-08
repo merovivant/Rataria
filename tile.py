@@ -39,15 +39,13 @@ class Tile(Body):
         pos_x = self.num * Tile.SIZE - camera.pos.x
         if pos_x <= - Tile.SIZE: return    
         screen.blit(self.block_texture, (pos_x, self.pos.y))
-        from pygame.draw import rect
-        rect(screen, (255,0,0), (self.hitbox.SE.x, self.hitbox.SE.y, self.width, self.height), 1)
 
     def damage(self, body, direction):
         if direction == Collision.TOP and isinstance(body, Rat):
             body.pos.y = self.pos.y - body.height
         return 0
     
-    def rebound(self, body, direction): 
+    def rebound(self, body, direction):         
         return 0
 
     def collide(self, *args):
